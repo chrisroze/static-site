@@ -5,7 +5,7 @@ class LeafNode(HTMLNode):
         super().__init__(tag=tag, value=value, children=None, props=props)
 
     def __repr__(self):
-        return f"LeafNode(tag='{self.tag}', value={self.value}, props={self.props})"
+        return f"LeafNode(tag='{self.tag}', value='{self.value}', props='{self.props}')"
     
     def __eq__(self, other):
         if not isinstance(other, LeafNode):
@@ -23,9 +23,3 @@ class LeafNode(HTMLNode):
         opening_tag = f"<{self.tag}{attrs}>"
         closing_tag = f"</{self.tag}>"
         return f"{opening_tag}{self.value}{closing_tag}"        
-    
-node1= LeafNode(tag='a', value='Hello, World!', props={'href': 'https://example.com'})
-print(node1.to_html())
-
-node1 = LeafNode(tag='p', value='Hello, World!')
-print(node1.to_html())

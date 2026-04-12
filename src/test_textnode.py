@@ -26,7 +26,7 @@ class TestTextNode(unittest.TestCase):
 
     def test_textnode_str(self):
         node = TextNode("Hello World", TextType.TEXT)
-        self.assertEqual(str(node), "text: Hello World")
+        self.assertEqual(str(node), ": Hello World")
 
     def test_invalid_text_type_raises(self):
         with self.assertRaises(ValueError):
@@ -38,11 +38,11 @@ class TestTextNode(unittest.TestCase):
 
     def test_textnode_str_link_with_url(self):
         node = TextNode("Boot.dev", TextType.LINK, "https://www.boot.dev")
-        self.assertEqual(str(node), "link: Boot.dev (https://www.boot.dev)")
+        self.assertEqual(str(node), "[link]: Boot.dev (https://www.boot.dev)")
 
     def test_textnode_str_link_without_url(self):
         node = TextNode("Boot.dev", TextType.LINK)
-        self.assertEqual(str(node), "link: Boot.dev")
+        self.assertEqual(str(node), "[link]: Boot.dev")
 
 
 

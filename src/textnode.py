@@ -2,12 +2,13 @@ from enum import Enum
 
 # This module defines the TextNode class, which represents a piece of text with a specific type (e.g., bold, italic, link).
 class TextType(Enum):
-    TEXT = "text"
-    BOLD = "bold"
-    ITALIC = "italic"
-    CODE = "code"
-    LINK = "link"
-    IMAGE = "image"
+    TEXT = ""
+    BOLD = "**"
+    ITALIC = "_"
+    CODE = "'"
+    LINK = "[link]"
+    IMAGE = "!"
+    QUOTE = ">"
 
 
 # The TextNode class represents a piece of text with a specific type (e.g., bold, italic, link).
