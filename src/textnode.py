@@ -12,6 +12,7 @@ class TextType(Enum):
 
 
 # The TextNode class represents a piece of text with a specific type (e.g., bold, italic, link).
+# It has attributes for the text content, the type of text, and an optional URL for links and images.
 class TextNode:
     def __init__(self, text: str, text_type: TextType = TextType.TEXT, url: str = None):
         if not isinstance(text_type, TextType):
@@ -26,7 +27,9 @@ class TextNode:
         return f"{self.text_type.value}: {self.text}"
     
     def __repr__(self):
-        return f"TextNode(TEXT='{self.text}', TEXT_TYPE={self.text_type}, URL='{self.url}')"
+        if self.text_type in {TextType.LINK, TextType.IMAGE} and self.url is not None:
+            return f"TextNode(TEXT='{self.text}', TEXT_TYPE={self.text_type}, URL='{self.url}')"
+        return f"TextNode(TEXT='{self.text}', TEXT_TYPE={self.text_type})"
     
     def __eq__(self, other):
         if not isinstance(other, TextNode):
