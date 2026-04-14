@@ -3,7 +3,7 @@ from htmlnode import HTMLNode
 from leafnode import LeafNode
 from parentnode import ParentNode
 from textnode import TextNode, TextType
-from main import extract_markdown_images, split_nodes_delimiter, split_nodes_link, text_node_to_html_node
+from main import extract_markdown_images, split_nodes_delimiter, split_nodes_link, text_node_to_html_node, text_to_textnodes
 
 
 class TestMain(unittest.TestCase):
@@ -46,11 +46,8 @@ class TestMain(unittest.TestCase):
         expected_html6 = '<code>This is some code</code>'
         self.assertEqual(html_node6.to_html(), expected_html6)  
 
-
-
 # Tests for split_nodes_delimiter function
 # =============================================
-
     def test_split_nodes_delimiter_bold(self):
          exemple1 = [TextNode("This is text with a **bolded phrase** in the middle", TextType.TEXT)]
          result1 = split_nodes_delimiter(exemple1,TextType.BOLD)
@@ -76,13 +73,13 @@ class TestMain(unittest.TestCase):
         self.assertEqual(result4, expected_result4)
 
     def test_split_nodes_delimiter_code(self):
-        exemple5 = [TextNode("This is text with a 'code phrase' in the middle", TextType.TEXT)]
+        exemple5 = [TextNode("This is text with a `code phrase` in the middle", TextType.TEXT)]
         result5 = split_nodes_delimiter(exemple5,TextType.CODE)
         expected_result5 = [TextNode("This is text with a ", TextType.TEXT), TextNode("code phrase", TextType.CODE), TextNode(" in the middle", TextType.TEXT)]
         self.assertEqual(result5, expected_result5)
 
     def test_split_nodes_delimiter_code_start_end(self):
-        exemple6 = [TextNode("'This is a code phrase' with bolded phrase at the start 'and at the end'", TextType.TEXT)]
+        exemple6 = [TextNode("`This is a code phrase` with bolded phrase at the start `and at the end`", TextType.TEXT)]
         result6 = split_nodes_delimiter(exemple6,TextType.CODE)
         expected_result6 = [TextNode("This is a code phrase", TextType.CODE), TextNode(" with bolded phrase at the start ", TextType.TEXT), TextNode("and at the end", TextType.CODE)]
         self.assertEqual(result6, expected_result6)
@@ -92,7 +89,6 @@ class TestMain(unittest.TestCase):
         result7 = split_nodes_delimiter(exemple7,TextType.QUOTE)
         expected_result7 = [TextNode("This is text with a ", TextType.TEXT), TextNode("quote phrase", TextType.QUOTE), TextNode(" in the middle", TextType.TEXT)]
         self.assertEqual(result7, expected_result7)
-
 
 # Tests for extract_markdown_images function
 # =============================================
@@ -111,7 +107,6 @@ class TestMain(unittest.TestCase):
         result = extract_markdown_images(text)
         self.assertEqual(result, [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("to boot dev", "https://www.boot.dev")])
 
-    
 # Tests for split_nodes_link function
 # =============================================
     def test_split_nodes_link(self):
@@ -135,7 +130,31 @@ class TestMain(unittest.TestCase):
         ]
         self.assertEqual(result, expected_result)
 
-  
+    def test_split_nodes_link_no_links(self):
+        nodes = [TextNode("This is text with no links or images", TextType.TEXT)]
+        result = split_nodes_link(nodes)
+        expected_result = [TextNode("This is text with no links or images", TextType.TEXT)]
+        self.assertEqual(result, expected_result)
+
+# Tests for text_to_textnodes function
+# =============================================
+    def test_text_to_textnodes(self):
+        text = "This is a **bold** text with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev) to boot.dev."
+        result = text_to_textnodes(text)
+        expected_result = [
+            TextNode("This is a ", TextType.TEXT),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" text with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+            TextNode(" to boot.dev.", TextType.TEXT)
+        ]
+        self.assertEqual(result, expected_result)
 
 
 if __name__ == "__main__":  

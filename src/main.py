@@ -33,7 +33,7 @@ def split_nodes_delimiter(old_nodes_list, text_type):
         temp_lst = old_nodes.text.split(text_type.value)        
         for i in range(len(temp_lst)):
             if len(temp_lst[i])!=0: 
-                node = TextNode(temp_lst[i],text_type) if i%2==1 else TextNode(temp_lst[i])
+                node = TextNode(temp_lst[i],text_type) if i%2==1 else TextNode(temp_lst[i],old_nodes.text_type, old_nodes.url)
                 list_of_nodes.append(node)
     return list_of_nodes
 
@@ -89,10 +89,15 @@ def tuple_to_textnode(tuple_list):
             text_nodes.append(TextNode(text, TextType.TEXT))
     return text_nodes   
 
-
+def text_to_textnodes(text):
+    text_node = TextNode(text)
+    text_node_list = split_nodes_link([text_node])
+    text_node_list = split_nodes_delimiter(text_node_list, TextType.BOLD)
+    text_node_list = split_nodes_delimiter(text_node_list, TextType.ITALIC)
+    text_node_list = split_nodes_delimiter(text_node_list, TextType.CODE)
+    return text_node_list
 
 def main():    
-
     pass
 
 if __name__ == "__main__":
