@@ -16,7 +16,15 @@ echo "Running tests for ParentNode..."
 python3 -m unittest discover -s src/ -p "test_parentnode.py"
 echo '************************************************************************'
 echo ""
-echo "Running tests for Main..."
+echo "Running tests for inline functions..."
+python3 -m unittest discover -s src/ -p "test_inline.py"
+echo '************************************************************************'
+echo ""
+echo "Running tests for block functions..."
+python3 -m unittest discover -s src/ -p "test_block.py"
+echo '************************************************************************'
+echo ""
+echo "Running tests for main functions..."
 python3 -m unittest discover -s src/ -p "test_main.py"
 echo '************************************************************************'
 echo ""

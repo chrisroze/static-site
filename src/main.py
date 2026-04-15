@@ -1,12 +1,57 @@
+from block import block_to_blocktype, markdown_to_blocks
+from inline import split_nodes_delimiter, extract_markdown_images, split_nodes_link, tuple_to_textnode, text_to_textnodes
 from textnode import TextNode, TextType
 from htmlnode import HTMLNode
 from leafnode import LeafNode
 from parentnode import ParentNode
 import pprint
 
-# This module defines the main functions for the static site generator, including functions 
-# to convert TextNode instances to HTMLNode instances, split TextNode instances based on delimiters, 
-# and extract markdown images from text.
+
+# This module defines the main functions for the static site generator, including functions
+# to convert TextNode instances to HTMLNode instances, split TextNode instances based on delimiters,
+# and extract markdown images from text. 
+def main():    
+
+    block01 = "# Heading 1 \n this is a heading 1 block"
+    block02 = "## Heading 2 \n this is a heading 2 block"
+    block03 = "### Heading 3 \n this is a heading 3 block"
+    block04 = "#### Heading 4 \n this is a heading 4 block"
+    block05 = "##### Heading 5 \n this is a heading 5 block"
+    block06 = "###### Heading 6 \n this is a heading 6 block"
+    block07 = "- Unordered list item 1 \n- Unordered list item 2 \n- Unordered list item 3"
+    block08 = "> Blockquote line 1 \n> Blockquote line 2 \n> Blockquote line 3"
+    block09 = "```\nCode block line 1\nCode block line 2\nCode block line 3\n```"
+    block10 = "1. Ordered list item 1 \n2. Ordered list item 2 \n3. Ordered list item 3"
+    block11 = "This is a paragraph block with **bold** text, _italic_ text, `code` text, a [link](https://www.example.com), and an ![image](https://www.example.com/image.jpg)."
+    
+    # positive test cases for block_to_blocktype function
+    print(("test01",block01,block_to_blocktype(block01)))
+    print(("test02",block02,block_to_blocktype(block02)))
+    print(("test03",block03,block_to_blocktype(block03)))
+    print(("test04",block04,block_to_blocktype(block04)))
+    print(("test05",block05,block_to_blocktype(block05)))
+    print(("test06",block06,block_to_blocktype(block06)))
+    print(("test07",block07,block_to_blocktype(block07)))
+    print(("test08",block08,block_to_blocktype(block08)))
+    print(("test09",block09,block_to_blocktype(block09)))
+    print(("test10",block10,block_to_blocktype(block10)))
+    print(("test11",block11,block_to_blocktype(block11)))
+    print("\n")
+    # negative test case for block_to_blocktype function
+    block12 = "This is a paragraph block without any markdown syntax."
+    print(("test12",block12,block_to_blocktype(block12)))
+    block013 = "> This is a blockquote block with a newline \n that does not start with a > character."
+    print(("test13",block013,block_to_blocktype(block013)))
+    block014 = "1. This is an ordered list blockwith a newline \n that does not start with the correct list number."
+    print(("test14",block014,block_to_blocktype(block014)))
+    block015 = "```\nThis is a code block that does not end with the correct delimiter.\n"
+    print(("test15",block015,block_to_blocktype(block015)))
+    block016 = "#This is a block that starts with a header markdown delimiter but does not follow the correct syntax.\n# This is not a valid heading block."
+    print(("test16",block016,block_to_blocktype(block016)))
+    block017 = "- This is an unordered list block with a newline \n that does not start with the correct list item syntax."
+    print(("test17",block017,block_to_blocktype(block017)))
+
+
 def text_node_to_html_node(text_node):
     if text_node.text_type == TextType.TEXT:
         return LeafNode(value=text_node.text)
@@ -25,80 +70,7 @@ def text_node_to_html_node(text_node):
     else:
         raise ValueError(f"Unsupported TextType: {text_node.text_type}")
 
-# This function splits a list of TextNode instances based on a specified TextType delimiter (e.g., bold, italic) 
-# and returns a new list of TextNode instances with the appropriate types.
-def split_nodes_delimiter(old_nodes_list, text_type):
-    list_of_nodes = []
-    for old_nodes in old_nodes_list:   
-        temp_lst = old_nodes.text.split(text_type.value)        
-        for i in range(len(temp_lst)):
-            if len(temp_lst[i])!=0: 
-                node = TextNode(temp_lst[i],text_type) if i%2==1 else TextNode(temp_lst[i],old_nodes.text_type, old_nodes.url)
-                list_of_nodes.append(node)
-    return list_of_nodes
 
-
-# This function splits a list of TextNode instances based on markdown link syntax 
-# and returns a new list of TextNode instances with the appropriate types (e.g., link, image, text).
-def extract_markdown_images(text):
-    lst = []  
-    while ("[" in text and "]" in text and "(" in text and ")" in text
-                and text.find("[") < text.find("]") < text.find("(") < text.find(")")):
-        temp = text.split("[",1)
-        link = temp[1].split("]",1)[0]
-        temp1 = temp[1].split("]",1)[1].split("(",1)[1].split(")",1)
-        url = temp1[0]
-        text = temp1[1]
-        lst.append((link, url))      
-    return lst
-
-# This function splits a list of TextNode instances based on markdown link syntax 
-# and returns a new list of TextNode instances with the appropriate types (e.g., link, image, text).
-def split_nodes_link(nodes_list):
-    lst = []  
-    for node in nodes_list:
-        text = node.text
-        while ("[" in text and "]" in text and "(" in text and ")" in text
-                    and text.find("[") < text.find("]") < text.find("(") < text.find(")")):
-            temp = text.split("[",1)
-            link = temp[1].split("]",1)[0]
-            temp1 = temp[1].split("]",1)[1].split("(",1)[1].split(")",1)
-            url = temp1[0]
-            text = temp1[1]
-            if temp[0][-1] == "!":
-                lst.append(("t",temp[0][:-1], None)) if temp[0] else None
-                lst.append(("p",link, url))
-            else:
-                lst.append(("t",temp[0], None)) if temp[0] else None
-                lst.append(("l",link, url))
-        if len(text) != 0:
-            lst.append(("t",text, None))
-    return tuple_to_textnode(lst)
-
-# This function converts a list of tuples (type, text, url) into a list of TextNode instances 
-# based on the specified type (e.g., link, image, text).
-# it is called by split_nodes_link to convert the output list of tuples into a list of TextNode instances.
-def tuple_to_textnode(tuple_list):
-    text_nodes = []
-    for type, text, url in tuple_list:
-        if type == "l":
-            text_nodes.append(TextNode(text, TextType.LINK, url))
-        elif type == "p":
-            text_nodes.append(TextNode(text, TextType.IMAGE, url))
-        else:
-            text_nodes.append(TextNode(text, TextType.TEXT))
-    return text_nodes   
-
-def text_to_textnodes(text):
-    text_node = TextNode(text)
-    text_node_list = split_nodes_link([text_node])
-    text_node_list = split_nodes_delimiter(text_node_list, TextType.BOLD)
-    text_node_list = split_nodes_delimiter(text_node_list, TextType.ITALIC)
-    text_node_list = split_nodes_delimiter(text_node_list, TextType.CODE)
-    return text_node_list
-
-def main():    
-    pass
 
 if __name__ == "__main__":
     main()

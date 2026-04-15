@@ -1,4 +1,6 @@
 from enum import Enum
+from leafnode import LeafNode
+from parentnode import ParentNode
 
 # This module defines the TextNode class, which represents a piece of text with a specific type (e.g., bold, italic, link).
 class TextType(Enum):
@@ -37,3 +39,24 @@ class TextNode:
         return (self.text == other.text and 
                 self.text_type == other.text_type and 
                 self.url == other.url)
+
+# This module defines the main functions for the static site generator, including functions 
+# to convert TextNode instances to HTMLNode instances, split TextNode instances based on delimiters, 
+# and extract markdown images from text.
+    def to_html_node(self):
+        if self.text_type == TextType.TEXT:
+            return LeafNode(value=self.text)
+        elif self.text_type == TextType.BOLD:
+            return ParentNode(tag='b', children=[LeafNode(value=self.text)])
+        elif self.text_type == TextType.ITALIC:
+            return ParentNode(tag='i', children=[LeafNode(value=self.text)])
+        elif self.text_type == TextType.LINK:
+            return ParentNode(tag='a', children=[LeafNode(value=self.text)], props={'href': self.url})
+        elif self.text_type == TextType.IMAGE:
+            return LeafNode(tag='img', props={'src': self.url, 'alt': self.text})
+        elif self.text_type == TextType.CODE:
+            return ParentNode(tag='code', children=[LeafNode(value=self.text)])
+        elif self.text_type == TextType.QUOTE:
+            return ParentNode(tag='blockquote', children=[LeafNode(value=self.text)])
+        else:
+            raise ValueError(f"Unsupported TextType: {self.text_type}")    
